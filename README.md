@@ -1,4 +1,7 @@
-# fluentd-opentelemetry Centos 7
+# Fluentd - Opentelemetry - Instana (Logs) - Centos 7
+
+![image](https://github.com/juan-conde-21/fluentd-opentelemetry/assets/13276404/3f63e53c-1395-4778-8a3d-d18633c54e8d)
+
 
 # Instalar opentelemetry collector contrib (Soporta fluentforward para recepcion de logs desde fluentd, no confundir con collector generico)
 
