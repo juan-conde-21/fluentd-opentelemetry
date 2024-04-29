@@ -1,7 +1,6 @@
 # fluentd-opentelemetry Centos 7
 
-
-#Instalar opentelemetry collector contrib (Soporta fluentforward para recepcion de logs desde fluentd, no confundir con collector generico)
+# Instalar opentelemetry collector contrib (Soporta fluentforward para recepcion de logs desde fluentd, no confundir con collector generico)
 
 1. Descargar y ejecutar la instalación del collector
 
@@ -67,8 +66,30 @@
        systemctl restart otelcol-contrib
        systemctl status otelcol-contrib
 
+# Instalar agente Instana
 
-#Instalar fluentd
+1. Descargar el instalador, reemplazar los valors de agent_key y tenant_location por los correspondientes para su tenant.
+
+       curl -o setup_agent.sh https://setup.instana.io/agent && chmod 700 ./setup_agent.sh && sudo ./setup_agent.sh -a {agent_key} -d {agent_key} -t dynamic -e {tenant_location}.instana.io:443 -s -y
+
+2. Editar el archivo de configuracion y habilitar el plugin de opentelemetry.
+
+       vi /opt/instana/agent/etc/instana/configuration.yaml
+
+   A nivel del archivo ubicar la seccion de opentelemtry y modificar de acuerdo como se muestra.
+
+       com.instana.plugin.opentelemetry:
+         grpc:
+           enabled: true
+         http:
+           enabled: true
+
+3. Reiniciar los servicios del agente.
+
+       systemctl restart instana-agent
+
+
+# Instalar fluentd
 
 1. Descargar y ejecutar instalador
 
@@ -142,7 +163,7 @@
        systemctl restart fluentd
        systemctl status fluentd
 
-#Instalar el plugin para el soporte de logs multilinea
+# Instalar el plugin para el soporte de logs multilinea
 
 1. Descargar instalador y ejecutar el source para las variables de entorno
 
@@ -267,29 +288,21 @@
        chmod +x genera_multi_log.sh
 
 
-# Instalar agente Instana
+# Ejecutar scripts de prueba y verificacion en Instana
 
+1. Ejecutar las pruebas con el script de log simple
 
-       curl -o setup_agent.sh https://setup.instana.io/agent && chmod 700 ./setup_agent.sh && sudo ./setup_agent.sh -a {agent_key} -d {agent_key} -t dynamic -e {tenant_location}.instana.io:443 -s
+       /opt/Proyecto/genera_simple_log.sh
 
-       vi /opt/instana/agent/etc/instana/configuration.yaml
+2. Verificar en Instana, para ello ingresar a la seccion de Analytics y seleccionar logs. Se deberan mostrar los logs identificadors por opentelemetry-stream, tambien podremos filtrar por la zona del agente o contenido del log.
 
+   ![image](https://github.com/juan-conde-21/fluentd-opentelemetry/assets/13276404/46373729-f151-46a3-a177-af056b757153)
 
-       com.instana.plugin.opentelemetry:
-         grpc:
-           enabled: true
-         http:
-           enabled: true
+3. Ejecutar las pruebas con el script de log multilinea.
 
+       /opt/Proyecto/genera_multi_log.sh
 
+4. Verificar en Instana, para ello ingresar a la seccion de Analytics y seleccionar logs. Se deberan mostrar los logs identificadors por opentelemetry-stream, tambien podremos filtrar por la zona del agente o contenido del log.
 
-
-       systemctl restart instana-agent
-
-
-
-# Ejecutar scripts de prueba
-
-/opt/Proyecto/genera_simple_log.sh
-/opt/Proyecto/genera_multi_log.sh
+   ![image](https://github.com/juan-conde-21/fluentd-opentelemetry/assets/13276404/d771e918-4811-4598-bc93-04bea8d9de1c)
 
